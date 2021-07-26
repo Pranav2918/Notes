@@ -44,29 +44,44 @@ class CloudFirestoreDemo extends StatelessWidget {
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot ds = snapshot.data!.docs[index];
-                return ListTile(
-                  title: Text(
-                    ds['title'],
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 16, letterSpacing: 1.0),
+                return Dismissible(
+                  background: Container(
+                      color: Colors.redAccent,
+                      child: Center(
+                        child: Icon(Icons.delete, color: Colors.white),
+                      )),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (direction) {
+                    try {
+                      FirebaseFirestore.instance
+                          .collection('todo')
+                          .doc(ds.id)
+                          .delete();
+                    } on Exception catch (e) {
+                      print(e);
+                    }
+                    // ignore: deprecated_member_use
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                        duration: Duration(milliseconds: 300),
+                        content: Text(
+                          'Deleted',
+                          style: TextStyle(color: Colors.redAccent),
+                        )));
+                  },
+                  key: Key(ds.toString()),
+                  child: ListTile(
+                    title: Text(
+                      ds['title'],
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          letterSpacing: 1.0),
+                    ),
+                    subtitle: Text(
+                      ds['desc'],
+                      style: TextStyle(color: Colors.white54),
+                    ),
                   ),
-                  subtitle: Text(
-                    ds['desc'],
-                    style: TextStyle(color: Colors.white54),
-                  ),
-                  trailing: InkWell(
-                      splashColor: Colors.redAccent,
-                      onTap: () {
-                        try {
-                          FirebaseFirestore.instance
-                              .collection('todo')
-                              .doc(ds.id)
-                              .delete();
-                        } on Exception catch (e) {
-                          print(e);
-                        }
-                      },
-                      child: Icon(Icons.minimize, color: Colors.red)),
                 );
               },
             );
