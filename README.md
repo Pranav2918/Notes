@@ -5,6 +5,6 @@
 
 ### Screenshots
 
-<img src="Home.png" height="500em"/><img src="add.png" height="500em"/>
+<img src="Home.png" height="500em"/> <img src="add.png" height="500em"/>
 
 ## FlutterDev
