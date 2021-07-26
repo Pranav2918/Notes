@@ -8,10 +8,25 @@ class AddItem extends StatefulWidget {
 }
 
 class _AddItemState extends State<AddItem> {
+  GlobalKey<FormState> _key = GlobalKey<FormState>();
   void clearText() {
     titleController.clear();
 
     descController.clear();
+  }
+
+  void addNote() {
+    if (_key.currentState!.validate()) {
+      print('valid');
+      FirebaseFirestore.instance
+          .collection('todo')
+          .add({'title': titleController.text, 'desc': descController.text});
+      Navigator.pop(context);
+      clearText();
+    } else {
+      print('Invalid');
+      clearText();
+    }
   }
 
   TextEditingController titleController = TextEditingController();
@@ -56,30 +71,37 @@ class _AddItemState extends State<AddItem> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: new Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        new TextField(
-                          style: TextStyle(color: Colors.white),
-                          cursorColor: Colors.red,
-                          controller: titleController,
-                          decoration: new InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Title',
-                              hintStyle: TextStyle(
-                                  color: Colors.white, letterSpacing: 1.0)),
-                        ),
-                        new TextField(
-                          style: TextStyle(color: Colors.white),
-                          cursorColor: Colors.red,
-                          controller: descController,
-                          decoration: new InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Descrition',
-                              hintStyle: TextStyle(
-                                  color: Colors.white, letterSpacing: 1.0)),
-                        ),
-                      ],
+                    child: Form(
+                      key: _key,
+                      child: new Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          new TextFormField(
+                            validator: (value) =>
+                                value!.isEmpty ? 'Enter Title' : null,
+                            style: TextStyle(color: Colors.white),
+                            cursorColor: Colors.red,
+                            controller: titleController,
+                            decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Title',
+                                hintStyle: TextStyle(
+                                    color: Colors.white, letterSpacing: 1.0)),
+                          ),
+                          new TextFormField(
+                            validator: (value) =>
+                                value!.isEmpty ? 'Enter Descrition' : null,
+                            style: TextStyle(color: Colors.white),
+                            cursorColor: Colors.red,
+                            controller: descController,
+                            decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Descrition',
+                                hintStyle: TextStyle(
+                                    color: Colors.white, letterSpacing: 1.0)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -87,12 +109,7 @@ class _AddItemState extends State<AddItem> {
             ),
             InkWell(
               onTap: () {
-                FirebaseFirestore.instance.collection('todo').add({
-                  'title': titleController.text,
-                  'desc': descController.text
-                });
-                clearText();
-                Navigator.pop(context);
+                addNote();
               },
               child: Container(
                 height: 40,
